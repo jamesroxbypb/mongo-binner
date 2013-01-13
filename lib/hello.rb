@@ -9,11 +9,18 @@ include Mongo
 @db     = @client[@config["mongo-db"]]
 
 collection = "items"
+analysis = "#{collection}.analysis"
+resolution = 15*60
+
 in_need = @db[collection].find({"bin_analysis" => {"$ne" => true}})
 in_need.each {|n|
-  t = n["_id"].generation_time 
+  t = n["_id"].generation_time.to_i
+  div = t / resolution
+  rounded = div * resolution
+  time_bin = Time.at(rounded)
+  @db[analysis].update({"bin" => time_bin},{"$inc" => {"count" => 1}}, {:upsert => true})
   puts n
-binding.pry
+  binding.pry
 }
 
 
