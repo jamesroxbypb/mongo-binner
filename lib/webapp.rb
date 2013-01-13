@@ -2,6 +2,7 @@ require "sinatra"
 require "json"
 require "sinatra/reloader"
 
+class MongoBinner < Sinatra::Base
 get "/hi" do
   body "Hello world"
   status 200
@@ -25,4 +26,7 @@ get "/data.json" do
 
 	body to_return
 	status 200
+end
+
+run! if app_file == $0
 end

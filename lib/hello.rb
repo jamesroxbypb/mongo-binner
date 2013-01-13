@@ -19,8 +19,8 @@ in_need.each {|n|
   rounded = div * resolution
   time_bin = Time.at(rounded)
   @db[analysis].update({"bin" => time_bin},{"$inc" => {"count" => 1}}, {:upsert => true})
-  puts n
-  binding.pry
+  n["bin_analysis"] = true
+  @db[collection].save(n)
 }
-
+#  binding.pry
 
