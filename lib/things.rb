@@ -68,6 +68,29 @@ post "/:tenant/:collection" do
 	status 200
 end
 
+put "/:tenant/:collection/:id" do
+  blob = JSON.parse request.body.read
+  @config = YAML.load_file "./config/config.yaml"
+  @client = Mongo::MongoClient.new(@config["mongo-host"], 27017)
+  @db     = @client[@config["mongo-db"]]
+
+  collection = "#{params[:tenant]}.#{params[:collection]}"
+  a = @db[collection].update({"_id" => BSON::ObjectId(params[:id])},blob,{:upsert => true})
+  body a.to_json
+  status 200
+end
+
+delete "/:tenant/:collection/:id" do
+  @config = YAML.load_file "./config/config.yaml"
+  @client = Mongo::MongoClient.new(@config["mongo-host"], 27017)
+  @db     = @client[@config["mongo-db"]]
+
+  collection = "#{params[:tenant]}.#{params[:collection]}"
+  a = @db[collection].remove({"_id" => BSON::ObjectId(params[:id])},{:limit => 1})
+  body a.to_json
+  status 200
+end
+
 
 run! if app_file == $0
 end
